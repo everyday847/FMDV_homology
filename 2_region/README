@@ -1,0 +1,21 @@
+# Start from the first model of the PDB structure 2NBX, which contains an NMR 
+# structure of EMCV. Excise the three-way junction:
+pdbslice.py 2nbx_m1.pdb -subset A:690-699 A:725-735 A:764-779 m1_
+
+# Renumber PDB to the FMDV sequence numbering; rename for convenience.
+cp m1_2nbx.pdb 2nbx_3wj_m1.renumbered.pdb
+renumber_pdb_in_place.py 2nbx_3wj_m1.renumbered.pdb A:315-324 A:362-372 A:392-407
+
+# Thread on the new 3WJ sequence.
+rna_thread -s 2nbx_3wj_m1.renumbered.pdb -seq gaugcccuucgaaggggacugcgguuuaaaaagcuuc
+mv threaded.pdb 2nbx_3wj_m1.threaded.pdb
+
+# Threading destroys numbering information; restore it.
+renumber_pdb_in_place.py 2nbx_3wj_m1.threaded.pdb A:315-324 A:362-372 A:392-407
+
+# This will create an imperfect model, because it will impose a GU
+# base pair (which should be wobbled) on a Watson-Crick geometry. Now,
+# we can use 'higher-tech' simulations (with e.g., rna_denovo or stepwise)
+# to obtain models with even further improved geometry, but we expect 
+# that all-atom minimization will be sufficient.
+rna_minimize -s 2nbx_3wj_m1.threaded.pdb -secstruct ".(((()))((()))(.....))." -score:weights stepwise/rna/rna_res_level_energy4.wts -restore_talaris_behavior -out:file:silent region_2.out

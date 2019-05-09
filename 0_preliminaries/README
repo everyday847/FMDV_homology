@@ -1,0 +1,10 @@
+# Preliminary notes
+#
+# Rosetta simulations are computationally intensive and should be executed on a
+# cluster of CPUs. The simulations conducted for this study required ~20,000
+# CPU-hours but a plausible reproduction could probably be conducted in ~2,000.
+#
+# Any stepwise or rna_denovo command line displayed below can be parallelized 
+# with MPI: just compile Rosetta using scons and extras=mpi,serialization. Each
+# stepwise simulation can produce about six models per CPU-day; each rna_denovo
+# simulation can produce sixty to one hundred models per CPU-day.

@@ -1,0 +1,16 @@
+# We have two options for constructing models of the full RNA, based on 
+# which secondary structure we assume for the J-arm. (That is: can we
+# assume the exact same secondary structure as EMCV, but with a slight
+# re-threading, or is the secondary structure different and we need to
+# model two junctions (regions 4 and 5)?)
+
+rna_denovo -in:file:silent region1.out region2.out region3.out region4.out region5.out region6.out -secstruct_file secstruct -secstruct_general_file secstruct_general -fasta target.fasta -bps_moves true -score:weights stepwise/rna/rna_res_level_energy7beta.wts -nstruct 100 -minimize_rna true -out:file:silent farna_rebuild.out -extra_minimize_res A:307-414
+
+rna_denovo -in:file:silent region1.out region2.out region3.out threaded_J_arm.out region6.out -secstruct_file secstruct -secstruct_general_file secstruct_general -fasta target.fasta -bps_moves true -score:weights stepwise/rna/rna_res_level_energy7beta.wts -nstruct 100 -minimize_rna true -out:file:silent farna_rebuild.out -use_legacy_job_distributor true -extra_minimize_res A:307-414
+
+# Cluster the lowest 1000 resulting structures (for either of the above 
+# simulations -- our assumption for the paper was the threaded EMCV 
+# structure).
+rna_cluster -in:file:silent farna_rebuild.out -out:file:silent farna_rebuild.clustered.out 
+
+# Choose the most populated structure from among the top 10 by energy.

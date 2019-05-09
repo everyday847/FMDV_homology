@@ -1,0 +1,21 @@
+# The FASTA for the structure we are modeling (included here) is:
+# >region4  A:323-326 A:358-363
+# ucagcugaga
+
+# Start from helices
+rna_helix.py -seq uc ga
+renumber_pdb_in_place.py helix.pdb A:323-324 A:362-363
+mv helix.pdb helix1.pdb
+
+rna_helix.py -seq ag cu
+renumber_pdb_in_place.py helix.pdb A:325-326 A:358-359
+mv helix.pdb helix2.pdb
+
+# Stepwise simulation of the region in question
+stepwise -s helix1.pdb helix2.pdb -fasta target.fasta -score:weights stepwise/rna/rna_res_level_energy7beta.wts -cycles 2000 -nstruct 100  -out:file:silent swm_rebuild_region4.out
+
+# We cluster the top models
+rna_cluster -in:file:silent swm_rebuild_region4.out -out:file:silent swm_rebuild_region4.clustered.out
+
+# We obtain a silent file of only the top 10 cluster centers for later use
+rna_score -in:file:silent swm_rebuild_region4.clustered.out -tags S_0 S_1 S_2 S_3 S_4 S_5 S_6 S_7 S_8 S_9

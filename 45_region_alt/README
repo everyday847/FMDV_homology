@@ -1,0 +1,18 @@
+# Start from the first model of the PDB structure 2NBX, which contains an NMR 
+# structure of EMCV. Excise the core J-arm motif:
+pdbslice.py 2nbx_m1.pdb -subset A:698-708 A:716-726 J_arm_
+
+# Renumber PDB to the FMDV sequence numbering; rename for convenience.
+cp J_arm_2nbx_m1.pdb 2nbx_m1_J_arm.renumbered.pdb
+renumber_pdb_in_place.py 2nbx_m1_J_arm.renumbered.pdb A:323-333 A:353-363
+
+# Thread on the new 3WJ sequence.
+rna_thread -s 2nbx_m1_J_arm.renumbered.pdb -seq ucagguaccccgggaucugaga
+mv threaded.pdb 2nbx_m1_J_arm.threaded.pdb
+
+# Threading destroys numbering information; restore it.
+renumber_pdb_in_place.py 2nbx_m1_J_arm.threaded.pdb A:323-333 A:353-363
+
+# Create a silent file containing the J_arm model for combination with the
+# multi-model files for fragment assembly.
+rna_score -s 2nbx_m1_J_arm.threaded.pdb -out:file:silent threaded_J_arm.out
